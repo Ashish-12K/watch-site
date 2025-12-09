@@ -62,7 +62,94 @@ const products = [
     alt: 'Vintage style watch with brown leather strap',
     short: 'Timeless vintage charm with handcrafted leather.',
     description: 'Inspired by vintage-era aesthetics, this watch features a warm brown genuine leather strap, antique brass casing, and a minimalist dial that stands the test of time.',
+  },
+
+  {
+  id: 7,
+  title: "Titan Edge Ceramic",
+  slug: "titan-edge-ceramic",
+  img: "/watch7.jpg",
+  img2: "/products/edge-2.jpg",
+  img3: "/products/edge-3.jpg",
+  alt: "Titan Edge Ceramic Watch",
+  price: "₹14,999",
+  badge: "New Arrival",
+  short: "Ultra–thin ceramic watch with a scratch-resistant finish.",
+  description:
+    "The Titan Edge Ceramic is engineered with precision and elegance. Featuring a ceramic body, sapphire glass, and an ultra–thin form factor, it defines premium craftsmanship with a luxurious feel."
+  },
+  {
+    id: 8,
+    title: "Aurex Heritage Auto",
+    slug: "aurex-heritage-auto",
+    img: "/watch8.jpg",
+    img2: "/products/heritage-2.jpg",
+    img3: "/products/heritage-3.jpg",
+    alt: "Aurex Heritage Automatic Watch",
+    price: "₹17,499",
+    badge: "Limited Edition",
+    short: "Classic automatic movement with vintage finish.",
+    description:
+      "Aurex Heritage Auto blends old-school charm with modern precision. The brushed steel case and transparent case-back showcase the beauty of automatic craftsmanship."
+  },
+  {
+    id: 9,
+    title: "ChronoMax Sport Pro",
+    slug: "chronomax-sport-pro",
+    img: "/watch9.jpg",
+    img2: "/products/sportpro-2.jpg",
+    img3: "/products/sportpro-3.jpg",
+    alt: "ChronoMax Sport Pro Watch",
+    price: "₹9,499",
+    badge: "Best Seller",
+    short: "Rugged chronograph with water resistance up to 100m.",
+    description:
+      "Designed for athletes and explorers, the ChronoMax Sport Pro offers precise chronograph timing, premium silicon straps, and toughness for all-weather performance."
+  },
+  {
+    id: 10,
+    title: "Royal Oak Luxe",
+    slug: "royal-oak-luxe",
+    img: "/watch10.jpg",
+    img2: "/products/royaloak-2.jpg",
+    img3: "/products/royaloak-3.jpg",
+    alt: "Royal Oak Luxe Watch",
+    price: "₹22,999",
+    badge: "Premium",
+    short: "A luxury steel design inspired by iconic octagonal watches.",
+    description:
+      "Royal Oak Luxe delivers premium aesthetics featuring brushed steel, geometric edges, and a bold dial design. A true statement piece for formal and luxury wear."
+  },
+  {
+    id: 11,
+    title: "Minimal Horizon Steel",
+    slug: "minimal-horizon-steel",
+    img: "/watch11.jpg",
+    img2: "/products/horizon-2.jpg",
+    img3: "/products/horizon-3.jpg",
+    alt: "Minimal Horizon Steel Watch",
+    price: "₹4,999",
+    badge: "",
+    short: "A clean, modern minimalist watch with slim steel casing.",
+    description:
+      "Minimal Horizon Steel combines simplicity with sophistication. Perfect for daily wear, this timepiece features a thin dial, polished steel straps, and dependable quartz precision."
+  },
+  {
+    id: 12,
+    title: "Blackout Stealth Edition",
+    slug: "blackout-stealth-edition",
+    img: "/watch12.jpg",
+    img2: "/products/stealth-2.jpg",
+    img3: "/products/stealth-3.jpg",
+    alt: "Blackout Stealth Edition Watch",
+    price: "₹7,999",
+    badge: "Trending",
+    short: "Matte-black finish with bold markers and luminous hands.",
+    description:
+      "The Blackout Stealth Edition features a bold monochrome aesthetic, scratch-resistant coating, and luminous hands for perfect visibility. A modern rugged watch that instantly stands out."
   }
+
+
 ];
 
 export default products;

@@ -1,3 +1,25 @@
 @import "tailwindcss";
 
 body { @apply bg-gray-50 text-gray-800; }
+
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+  background: #000;
+  color: white;
+}
+
+.marquee-text {
+  display: inline-block;
+  padding: 8px 0;
+  animation: marquee 12s linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}

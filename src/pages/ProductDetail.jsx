@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import products from "../data/product";
 import { useDispatchCart } from "../contexts/CartContext";
 import ProductCard from "../components/ProductCard";
+import CartDrawer from "../components/CartDrawer"; // new import
 
 export default function ProductDetail() {
   const { slug } = useParams();
@@ -12,7 +13,8 @@ export default function ProductDetail() {
   // state must be declared before the effect that resets them
   const [qty, setQty] = useState(1);
   const [mainImg, setMainImg] = useState(product ? product.img : "");
-  const [quickViewProduct, setQuickViewProduct] = useState(null); // <-- quick view state
+  const [quickViewProduct, setQuickViewProduct] = useState(null); // quick view state
+  const [openCart, setOpenCart] = useState(false); // local drawer open state
 
   // run when slug or product changes (handles clicking related products)
   useEffect(() => {
@@ -54,6 +56,7 @@ export default function ProductDetail() {
     const alt = p.alt;
     const quantity = payloadProduct ? 1 : qty;
 
+    // update cart context
     dispatch({
       type: "ADD",
       payload: {
@@ -65,8 +68,14 @@ export default function ProductDetail() {
         qty: quantity,
       },
     });
-    // Keep this if Home listens to open-cart
-    window.dispatchEvent(new CustomEvent("open-cart", {}));
+
+    // open the local cart drawer so users see the item immediately (demo behavior)
+    setOpenCart(true);
+
+    // optional app-wide event (keeps compatibility)
+    window.dispatchEvent(new CustomEvent("add-to-cart", { detail: { product: { id, title, price, img, alt, qty: quantity } } }));
+    // debug
+    console.log("Added to cart (and opened drawer):", { id, title, price, qty: quantity });
   }
 
   // helper to extract numeric value from price string
@@ -238,6 +247,9 @@ export default function ProductDetail() {
           </div>
         </div>
       )}
+
+      {/* Local Cart Drawer for this page */}
+      <CartDrawer open={openCart} onClose={() => setOpenCart(false)} />
     </main>
   );
 }
