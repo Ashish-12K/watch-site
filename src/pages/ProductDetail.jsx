@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import products from "../data/product";
 import { useDispatchCart } from "../contexts/CartContext";
@@ -8,6 +8,22 @@ export default function ProductDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const product = products.find((p) => p.slug === slug);
+
+  // state must be declared before the effect that resets them
+  const [qty, setQty] = useState(1);
+  const [mainImg, setMainImg] = useState(product ? product.img : "");
+  const [quickViewProduct, setQuickViewProduct] = useState(null); // <-- quick view state
+
+  // run when slug or product changes (handles clicking related products)
+  useEffect(() => {
+    if (!product) return;
+    // Scroll to top (smooth). Use behavior: 'auto' if you prefer instant jump.
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    // Reset local UI state for the new product
+    setMainImg(product.img);
+    setQty(1);
+  }, [slug, product]);
 
   // if product not found, show a friendly fallback
   if (!product) {
@@ -28,27 +44,32 @@ export default function ProductDetail() {
   }
 
   const dispatch = useDispatchCart();
-  const [qty, setQty] = useState(1);
-  const [mainImg, setMainImg] = useState(product.img);
 
-  function addToCart() {
-    // payload shape used by CartContext: include id, title, price (string), img, alt
+  function addToCart(payloadProduct = null) {
+    const p = payloadProduct || product;
+    const img = payloadProduct ? payloadProduct.img : mainImg;
+    const id = p.id;
+    const title = p.title;
+    const price = p.price;
+    const alt = p.alt;
+    const quantity = payloadProduct ? 1 : qty;
+
     dispatch({
       type: "ADD",
       payload: {
-        id: product.id,
-        title: product.title,
-        price: product.price,
-        img: mainImg,
-        alt: product.alt,
-        qty,
+        id,
+        title,
+        price,
+        img,
+        alt,
+        qty: quantity,
       },
     });
-    // Optional: open cart via custom event, if Home listens for it
+    // Keep this if Home listens to open-cart
     window.dispatchEvent(new CustomEvent("open-cart", {}));
   }
 
-  // simple numeric price extraction helper (for displaying totals)
+  // helper to extract numeric value from price string
   const numericPrice = (p) => {
     const n = parseInt(String(p).replace(/[^0-9]/g, ""), 10);
     return isNaN(n) ? 0 : n;
@@ -73,7 +94,6 @@ export default function ProductDetail() {
           </div>
 
           <div className="mt-4 grid grid-cols-3 gap-3">
-            {/* If you have extra image URLs in product.images, show them; otherwise repeat product.img */}
             {([product.img, product.img2, product.img3].filter(Boolean)).map((src, i) => (
               <button
                 key={i}
@@ -120,7 +140,7 @@ export default function ProductDetail() {
             </div>
 
             <button
-              onClick={addToCart}
+              onClick={() => addToCart()}
               className="px-6 py-3 bg-black text-white rounded-lg shadow"
             >
               Add to cart
@@ -160,11 +180,64 @@ export default function ProductDetail() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {related.map((r) => (
             <Link key={r.id} to={`/product/${r.slug}`}>
-              <ProductCard product={r} onQuickView={() => {}} />
+              {/* hide inner Details link since the whole card is clickable */}
+              <ProductCard
+                product={r}
+                onQuickView={() => setQuickViewProduct(r)}
+                showDetailsLink={false}
+              />
             </Link>
           ))}
         </div>
       </section>
+
+      {/* Quick View Modal */}
+      {quickViewProduct && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-xl relative p-4">
+
+            {/* Close Button */}
+            <button
+              className="absolute right-3 top-3 text-2xl"
+              onClick={() => setQuickViewProduct(null)}
+            >
+              ×
+            </button>
+
+            {/* Image */}
+            <img
+              src={quickViewProduct.img}
+              alt={quickViewProduct.alt}
+              className="w-full h-64 object-cover rounded-xl"
+            />
+
+            {/* Title */}
+            <h2 className="text-xl font-bold mt-4">{quickViewProduct.title}</h2>
+            <p className="text-gray-500 mt-1">{quickViewProduct.short}</p>
+
+            {/* Price */}
+            <div className="text-2xl font-semibold mt-3">{quickViewProduct.price}</div>
+
+            {/* Buttons */}
+            <div className="mt-5 flex gap-3">
+              <button
+                onClick={() => { addToCart(quickViewProduct); setQuickViewProduct(null); }}
+                className="flex-1 py-2 bg-black text-white rounded-lg"
+              >
+                Add to cart
+              </button>
+
+              <Link
+                to={`/product/${quickViewProduct.slug}`}
+                className="flex-1 py-2 border rounded-lg flex items-center justify-center"
+                onClick={() => setQuickViewProduct(null)}
+              >
+                View details
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
