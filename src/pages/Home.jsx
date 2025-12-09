@@ -1,36 +1,72 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import Hero from '../components/Hero';
+import ProductCard from '../components/ProductCard';
+import ProductModal from '../components/ProductModal';
+import CartDrawer from '../components/CartDrawer';
+import Navbar from '../components/Navbar';
+import productsData from '../data/product.js';
+import { CartProvider, useDispatchCart } from '../contexts/CartContext';
+import { useCart } from '../contexts/CartContext';
 
-export default function Home({ products }){
+function HomeInner(){
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState('featured');
+  const [selected, setSelected] = useState(null);
+  const [openCart, setOpenCart] = useState(false);
+  const [items, setItems] = useState(productsData);
+  const dispatch = useDispatchCart();
+  const cart = useCart();
+
+  useEffect(()=>{
+    function handler(e){
+      const product = e.detail.product;
+      dispatch({type:'ADD', payload:{...product}});
+      setOpenCart(true);
+    }
+    window.addEventListener('add-to-cart', handler);
+    return ()=> window.removeEventListener('add-to-cart', handler);
+  },[dispatch]);
+
+  useEffect(()=> {
+    let filtered = productsData.filter(p => p.title.toLowerCase().includes(query.toLowerCase()));
+    if (sort === 'price-asc') filtered = filtered.sort((a,b)=> parseInt(a.price.replace(/[^0-9]/g,'')) - parseInt(b.price.replace(/[^0-9]/g,'')));
+    if (sort === 'price-desc') filtered = filtered.sort((a,b)=> parseInt(b.price.replace(/[^0-9]/g,'')) - parseInt(a.price.replace(/[^0-9]/g,'')));
+    setItems(filtered);
+  },[query, sort]);
+
   return (
-    <main className="max-w-6xl mx-auto px-6 py-12">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
-        <div>
-          <h1 className="text-4xl md:text-5xl font-bold">Timeless Watches</h1>
-          <p className="text-gray-600 mt-2">Premium timepieces crafted for style and precision.</p>
+    <>
+      <Navbar onOpenCart={()=>setOpenCart(true)} />
+      <Hero />
+      <main className="max-w-6xl mx-auto px-6 py-12">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search watches..." className="px-4 py-2 border rounded-lg" />
+            <select value={sort} onChange={e=>setSort(e.target.value)} className="px-3 py-2 border rounded-lg">
+              <option value="featured">Featured</option>
+              <option value="price-asc">Price: Low → High</option>
+              <option value="price-desc">Price: High → Low</option>
+            </select>
+          </div>
+
+          <div className="text-sm text-gray-500">{items.length} results</div>
         </div>
-        <a href="#products" className="inline-block px-4 py-2 bg-black text-white rounded-lg">Shop Collection</a>
-      </header>
 
-      <section id="products" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {products.map(p => (
-          <Link key={p.id} to={`/product/${p.slug}`} className="block bg-white rounded-2xl shadow hover:shadow-lg overflow-hidden transition">
-            <img src={p.img} alt={p.alt} className="w-full h-56 object-cover"/>
-            <div className="p-4">
-              <h3 className="font-semibold text-lg">{p.title}</h3>
-              <p className="text-sm text-gray-500 mt-1">{p.short}</p>
-              <div className="mt-3 flex items-center justify-between">
-                <span className="font-medium">{p.price}</span>
-                <span className="text-xs text-gray-400">View →</span>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </section>
+        <section id="products" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {items.map(p => <ProductCard key={p.id} product={p} onQuickView={setSelected} />)}
+        </section>
+      </main>
 
-      <footer className="mt-12 text-center text-sm text-gray-500">
-        Demo site • Images are placeholders
-      </footer>
-    </main>
-  );
+      <ProductModal product={selected} onClose={()=>setSelected(null)} onAdd={(p)=>{ dispatch({type:'ADD', payload:{...p}}); setSelected(null); setOpenCart(true); }} />
+      <CartDrawer open={openCart} onClose={()=>setOpenCart(false)} />
+    </>
+  )
+}
+
+export default function Home(){
+  return (
+    <CartProvider>
+      <HomeInner />
+    </CartProvider>
+  )
 }
